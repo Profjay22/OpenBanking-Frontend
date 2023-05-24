@@ -1,8 +1,30 @@
 import { useState } from "react";
 import styled from 'styled-components';
-import {data} from './Data'
 import CreditScoreChart from "./CreditscoreChat";
 import Profile from "./Profile";
+import axios from "axios";
+import BarChart from "./BarChat";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
+const AccountNumberInput = styled.input`
+  width: 300px;
+  height: 40px;
+  background-color: #d9d9d9;
+  border: none;
+  border-radius: 4px;
+  padding: 0 10px;
+  margin-left: 10px;
+  font-size: 16px;
+ 
+  border: 2px solid ${(props) => (props.isValid ? "green" : "#FFCCCB")};
+
+  @media only screen and (max-width: 768px) {
+    width: 100%;
+    margin: 10px 0;
+  }
+`;
 const SearchContainer = styled.div`
   display: flex;
   margin-left: auto;
@@ -13,11 +35,13 @@ const SearchContainer = styled.div`
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
   flex-direction: column;
   width: 75%;
+  padding-bottom: 20px;
 
   @media only screen and (max-width: 768px) {
     margin-left: 40%;
     margin-top: 50px;
     flex-direction: column;
+   
     
     
   }
@@ -33,6 +57,7 @@ const SearchInput = styled.input`
   margin-left: 10px;
   font-size: 16px;
   color: #595959;
+ 
 
   @media only screen and (max-width: 768px) {
     width: 100%;
@@ -49,8 +74,8 @@ const SearchButton = styled.button`
   cursor: pointer;
   transition: background-color 0.3s ease-in-out;
   position: absolute;
-  bottom: 2%;
-  left: 27%;
+  bottom: 22%;
+  left: 71%;
  
 
   &:hover {
@@ -64,31 +89,122 @@ const SearchButton = styled.button`
 
 
 
-const Search = () => {
+const Search = ({keyword, setReportData , reportData, saveReportToLocalStorage,setResults }) => {
 
   const [accoutNumber, setAccountNumber] = useState("");
-  const [creditscore, setCreditScore] = useState();
-  const [Names, setName] = useState("");
-  const [accN, setaccN] = useState("");
-  const [cScore, setCscore] = useState();
-  const SearchAction = (e) => {
-    setAccountNumber(e.target.value);
-    console.log(data);
+  const [amount, setAmount] = useState();
+  const [isAccountNumberFocused, setAccountNumberFocused] = useState(false);
+ 
+const [firstName, setFirstName] = useState("");
+const [lastName, setLastName] = useState("");
+const [creditScores, setCreditScores] = useState();
+const [bank, setBank] = useState("");
+const [defaulter, setDefaulter] = useState(false);
+const [accountType, setAccountType] = useState("");
+const [ capableAmount, setCapableAmount] = useState(null);
+
+const validateAccountNumber = (value) => {
+  const accountNumberRegex = /^(?!-)(?:0|[1-9]\d{0,11})?$/;
+  
+  return accountNumberRegex.test(value);
+};
+
+const validateAmount = (value) => {
+  const amountRegex = /^(?!-)(?:0|[1-9]\d*)$/;
+  
+  ; // Matches zero or more digits
+  return amountRegex.test(value);
+};
+
+const handleAccountNumberChange = (e) => {
+  const inputValue = e.target.value;
+  if (validateAccountNumber(inputValue)) {
+    setAccountNumber(inputValue);
   }
-  const account = data.find(account => account.accountNo === accoutNumber);
+};
+
+const handleAmountChange = (e) => {
+  const inputValue = e.target.value;
+  if (validateAmount(inputValue) || inputValue === "") {
+    setAmount(inputValue);
+  }
+};
+  
+const handleAccountNumberFocus = () => {
+  setAccountNumberFocused(true);
+};
+
+const handleAccountNumberBlur = () => {
+  setAccountNumberFocused(false);
+};
+ 
   const checkCreditScore = () => {
-   
-    console.log(account);  
-    if (account) {
-      setCreditScore(account.creditScore);
-      setName(account.name);
-      setaccN(account.accountNo);
-      setCscore(account.creditScore);
-      setAccountNumber("");
-    } else {
-      window.alert("Account number not found!");
-      setAccountNumber("");
+
+    if (accoutNumber.length !== 12) {
+      toast.error("Invalid account number");
+      return;
     }
+
+    if (!validateAmount(amount)) {
+      toast.error("Invalid amount");
+      return;
+    }
+    const userInput = prompt("Enter your key");
+
+    if(userInput === keyword) {
+      toast.success("Valid key");
+      
+      axios
+    .post("http://localhost:5215/api/credit_score/score", {
+      accountNumber: accoutNumber,
+      amount: amount,
+    })
+    .then((response) => {
+      console.log(response.data); 
+      const { firstName, lastName, creditScore, bank, defaulter, accountType, suggestedAmount } = response.data;
+      setFirstName(firstName);
+      setLastName(lastName);
+      setCreditScores(creditScore);
+      setBank(bank);
+      setDefaulter(defaulter);
+      setAccountType(accountType);
+      setCapableAmount(suggestedAmount);
+      setResults(Math.round(creditScore * 100));
+
+      const newReportData = [
+        ...reportData,
+        {
+          firstName,
+          lastName,
+          creditScore,
+          bank,
+          defaulter,
+          accountType,
+          suggestedAmount,
+          accoutNumber,
+          amount,
+          date: new Date().toLocaleDateString(),
+        },
+      ];
+
+      // Update the report data state variable
+      setReportData(newReportData);
+
+      // Save the updated report data to local storage
+      saveReportToLocalStorage(newReportData);
+
+    })
+    .catch((error) => {
+      toast.error("Invalid account number");
+      console.error("Error fetching credit score:", error);
+    });
+    }
+
+    else{
+      toast.error("Enter a valid key");
+    }
+    
+   
   }
   
   
@@ -101,12 +217,27 @@ const Search = () => {
         
       </div>
       <div style={{marginTop: '10px'}} >
-      <SearchInput onChange={SearchAction} value={accoutNumber} type="text" placeholder="Enter your Account Number" />
-      <SearchButton onClick={checkCreditScore}>Verify</SearchButton>
+
+        <AccountNumberInput onChange={handleAccountNumberChange} value={accoutNumber} 
+        type="text" placeholder="Enter your Account Number"
+        onFocus={handleAccountNumberFocus}
+        onBlur={handleAccountNumberBlur}
+        isFocused={isAccountNumberFocused}
+        isValid={accoutNumber.length === 12}
+        />
+        <SearchInput onChange={handleAmountChange} value={amount} type="number" 
+        placeholder="Enter Amount"   isValid={validateAmount(amount) || amount === ""} />
+        <SearchButton onClick={checkCreditScore}>Check</SearchButton>
+
       </div>
     </SearchContainer>
-      <CreditScoreChart creditscore = {creditscore} />
-      <Profile Names={Names} cScore={cScore} accN = {accN}  />
+    <ToastContainer />
+      <CreditScoreChart creditScores = {creditScores} />
+      <Profile firstName={firstName} lastName = {lastName} creditScores = {creditScores} 
+      bank = {bank} defaulter = {defaulter} accountType = {accountType} accoutNumber = {accoutNumber}
+      capableAmount = {capableAmount}
+      />
+       <BarChart creditScores = {creditScores} amount={amount} />
     </>
   );
 };

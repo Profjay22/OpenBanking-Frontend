@@ -2,11 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
-import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import ContactSupportOutlinedIcon from '@mui/icons-material/ContactSupportOutlined';
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined';
 import { Link, useLocation } from "react-router-dom";
-
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 const NavbarContainer = styled.div`
   background-color: #001965;
   width: 25%;
@@ -21,6 +20,10 @@ const NavbarContainer = styled.div`
     height: 105vh;
     flex-direction: column;
     justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
    
   }
 `;
@@ -107,7 +110,7 @@ const Navbar = () => {
     return (
       <NavbarContainer>
         <Header>
-          <Title>Open-Banking</Title>
+          <Title>Payback Nigeria</Title>
           <HamburgerIcon onClick={toggleMobileMenu}>
             {isMobileMenuOpen ? '✕' : '☰'}
           </HamburgerIcon>
@@ -125,18 +128,24 @@ const Navbar = () => {
             Profile
             </Link>
            
+          </LinkItem >
+          <LinkItem active={location.pathname === '/report'}>
+            <Link to="/report"  style={{textDecoration: 'none', color: 'white'}}>
+            <IconWrapper><AssessmentOutlinedIcon /></IconWrapper>
+             Report
+            </Link>
           </LinkItem>
-          <LinkItem>
-            <IconWrapper><NotificationsNoneOutlinedIcon /></IconWrapper>
-            Notifications
+          <LinkItem active={location.pathname === '/helpdesk'}>
+            <Link to="/helpdesk"  style={{textDecoration: 'none', color: 'white'}}>
+              <IconWrapper><ContactSupportOutlinedIcon /></IconWrapper>
+              HelpDesk
+            </Link>
           </LinkItem>
-          <LinkItem>
-            <IconWrapper><SettingsOutlinedIcon /></IconWrapper>
-            Settings
-          </LinkItem>
-          <LinkItem>
-            <IconWrapper><PowerSettingsNewOutlinedIcon /></IconWrapper>
-            Logout
+          <LinkItem active={location.pathname === '/login'}>
+            <Link to='/login' style={{textDecoration: 'none', color: 'white'}}>
+              <IconWrapper><PowerSettingsNewOutlinedIcon /></IconWrapper>
+              Logout
+            </Link>
           </LinkItem>
         </LinkList>
         <HamburgerIcon style={{display: window.innerWidth >= 768 ? 'none' : 'flex'}} onClick={toggleMobileMenu}>

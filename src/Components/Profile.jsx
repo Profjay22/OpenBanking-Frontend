@@ -19,7 +19,7 @@ const Wrapper = styled.div`
   width: 36%;
   position: absolute;
   left: 23%;
-  bottom: 5%;
+  top: 68%;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease-in-out;
@@ -59,28 +59,43 @@ const DetailItem = styled.div`
   
 `;
 
-const getCreditCheck = (cScore) => {
-    if (cScore >= 0 && cScore <= 40) {
-      return <span style={{ color: "red" }}>Failed</span>;
-    } else if (cScore >= 41 && cScore <= 69) {
-      return <span style={{ color: "#F0BD2D" }}>Average</span>;
-    } else if (cScore >= 70 && cScore <= 100) {
-      return <span style={{ color: "green" }}>Passed</span>;
-    }
-  };
+// const getCreditCheck = (cScore) => {
+//     if (cScore >= 0 && cScore <= 49) {
+//       return <span style={{ color: "red" }}>Failed</span>;
+//     } else if (cScore >= 50 && cScore <= 69) {
+//       return <span style={{ color: "#F0BD2D" }}>Average</span>;
+//     } else if (cScore >= 70 && cScore <= 100) {
+//       return <span style={{ color: "green" }}>Passed</span>;
+//     }
+//   };
 
-const Profile = ({ Names, cScore, accN  }) => {
-    const creditCheck = getCreditCheck(cScore);
-    
+const getDefaulter = (defaults) => {
+    if(defaults === true){
+      return <span style={{ color: "red"}}> Yes </span>
+    }
+    else{
+      return <span style={{ color: "green" }}>No</span>
+    }
+}
+
+const Profile = ({firstName, capableAmount ,lastName,creditScores, bank,defaulter,accountType,accoutNumber}) => {
+  let result = Math.round(100 * creditScores );  
+
+ // const creditCheck = getCreditCheck(result);
+    const defaultCheck = getDefaulter(defaulter);
   return (
     <Wrapper>
       <ProfileTitle>Customer Profile</ProfileTitle>
       <ProfileDetails>
-        <DetailItem>Name: {Names}  </DetailItem>
-        <DetailItem>Account No: {accN}</DetailItem>
-        <DetailItem>Credit Score: {cScore + "%"}</DetailItem>
-        <DetailItem>Credit Check: {creditCheck}</DetailItem>
-
+        <DetailItem>FirstName: {firstName}  </DetailItem>
+        <DetailItem>LastName: {lastName}  </DetailItem>
+        <DetailItem>Account No: {accoutNumber}</DetailItem>
+        <DetailItem>Account Type: {accountType}</DetailItem>
+        <DetailItem>Bank: {bank}</DetailItem>
+        <DetailItem>Defaulted Loan: {defaultCheck}</DetailItem>
+       
+        {result < 70 && <DetailItem>Capable Amount: ₦{Math.round(capableAmount)}</DetailItem>}
+        <DetailItem>Credit Score: {result + "%"}</DetailItem>
       </ProfileDetails>
     </Wrapper>
   );

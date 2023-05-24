@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import Search from './Search';
 import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
+import React, { useEffect, useState } from 'react';
 
 const Container = styled.div`
   display: flex;
@@ -131,14 +132,52 @@ const Left = styled.div`
     display: flex;
 `
 
-const Dashboard = () => {
+const Dashboard = ({keyword, setReportData , saveReportToLocalStorage, reportData}) => {
+
+  const [results, setResults] = useState(0);
+  const [request, setRequest] = useState(() => {
+    const savedRequest = localStorage.getItem('request');
+    return savedRequest ? Number(savedRequest) : 0;
+  });
+  const [success, setSuccess] = useState(() => {
+    const savedSuccess = localStorage.getItem('success');
+    return savedSuccess ? Number(savedSuccess) : 0;
+  });
+  const [failure, setFailure] = useState(() => {
+    const savedFailure = localStorage.getItem('failure');
+    return savedFailure ? Number(savedFailure) : 0;
+  });
+
+  useEffect(() => {
+    if(results > 0){
+    setRequest((prevRequest) => prevRequest + 1);
+  }
+    if (results >= 80) {
+      setSuccess((prevSuccess) => prevSuccess + 1);
+    } else if( results > 0 && results < 80 ){
+      setFailure((prevFailure) => prevFailure + 1);
+    }
+    
+  }, [results]);
+
+  useEffect(() => {
+    localStorage.setItem('request', request.toString());
+  }, [request]);
+
+  useEffect(() => {
+    localStorage.setItem('success', success.toString());
+  }, [success]);
+
+  useEffect(() => {
+    localStorage.setItem('failure', failure.toString());
+  }, [failure]);
   return (
     <>
         <Container>
       <Card>
         <Header>
           <div><span>&lt;/&gt;</span></div>
-          <div>43</div>
+          <div>{ request}</div>
         </Header>
         <Texts color="#595959">Requests</Texts>
         <Line />
@@ -151,36 +190,36 @@ const Dashboard = () => {
       <Card>
         <Header>
           <div style={{backgroundColor: '#01A408'}}><span>✔</span></div>
-          <div>35</div>
+          <div>{success}</div>
         </Header>
         <Texts color="#595959">Success</Texts>
         <Line />
         <Left>
-        <Text color="#C13A3A">-12%</Text>
-        <Subtext>this week</Subtext>
+        <Text color="#C13A3A">{`${Math.round(((success*100)/request))}%`}</Text>
+        <Subtext>Success Rate</Subtext>
         </Left>
       </Card>
 
       <Card>
         <Header>
           <div style={{backgroundColor: '#E70000'}}><span>X</span></div>
-          <div>17</div>
+          <div>{failure}</div>
         </Header>
         <Texts color="#595959">Failed</Texts>
         <Line />
         <Left>
-        <Text color="#595959">0%</Text>
-        <Subtext>this week</Subtext>
+        <Text color="#595959">{`${Math.round(((failure*100)/request))}%`}</Text>
+        <Subtext>Failure Rate</Subtext>
         </Left>
       </Card>
 
       <Card>
         <Header>
         <div style={{backgroundColor: '#001965'}}><span><Person2OutlinedIcon/></span></div>
-          <div>68</div>
+          <div>1</div>
         </Header>
        
-        <Texts color="#595959">Levels</Texts>
+        <Texts color="#595959">Level</Texts>
         <Line />
         <Left>
         <Text color="#01A408">+40%</Text>
@@ -190,7 +229,7 @@ const Dashboard = () => {
       
     </Container>
 
-    <Search/>
+    <Search keyword={keyword} setResults = {setResults} reportData= {reportData} setReportData= {setReportData} saveReportToLocalStorage={saveReportToLocalStorage}/>
     </>
 
   );

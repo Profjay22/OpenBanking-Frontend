@@ -8,22 +8,23 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const Wrapper = styled.div`
   width: 33%;
   position: absolute;
-  bottom: 4%;
+  top: 68%;
   right: 3%;
-  padding: 20px;
+  padding: 40px 20px 50px 20px;
   background-color: #ffffff;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
 `;
 
-const CreditScoreChart = ({ creditscore }) => {
+const CreditScoreChart = ({ creditScores }) => {
+  const result = Math.round(100 * creditScores);
   const chartData = {
     labels: ["Credit Score"],
     datasets: [
       {
-        data: [creditscore, 100 - creditscore],
+        data: [result, 100 - result],
         backgroundColor: 
-          creditscore >= 70 ? ['#2ecc71', '#e74c3c'] :
-          creditscore >= 40 ? ['#2ecc71', '#e74c3c'] :
+        result >= 70 ? ['#2ecc71', '#e74c3c'] :
+        result >= 40 ? ['#2ecc71', '#e74c3c'] :
           ['#2ecc71', '#e74c3c'],
         borderWidth: 0,
       },
@@ -65,7 +66,7 @@ const CreditScoreChart = ({ creditscore }) => {
           position.top + window.pageYOffset + this._chart.height / 2 + 'px';
         tooltipEl.style.pointerEvents = 'none';
         tooltipEl.querySelector('span').innerHTML =
-          creditscore.toFixed(0) + '%';
+        result.toFixed(0) + '%';
       },
     },
     backgroundColor: ['#ffffff'],

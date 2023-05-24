@@ -1,25 +1,28 @@
 import React from 'react';
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
 import Navbar from './Navbars';
 
 const ProfilesContainer = styled.div`
   display: flex;
   height: 100%;
   max-height: 100vh;
-
+  align-items: center;
+  justify-content: center;
+  
 `;
 
-
 const ContentContainer = styled.div`
-  flex: 1;
+  flex: 2;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-top: 20px;
+  margin-left: 260px;
+  background-color: #D9D9D9;
 `;
 
-const ProfileCard = styled.div`
+const ProfileCard = styled(motion.div)`
   width: 80%;
   max-width: 500px;
   display: flex;
@@ -36,12 +39,11 @@ const ProfileCard = styled.div`
   }
 `;
 
-// const Title = styled.h1`
-//   font-size: 32px;
-//   margin: 0;
-//   margin-bottom: 20px;
-//   text-align: center;
-// `;
+const Label = styled.label`
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+`;
 
 const Input = styled.input`
   width: 100%;
@@ -53,55 +55,46 @@ const Input = styled.input`
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
 `;
 
-const Label = styled.label`
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 5px;
-`;
-
-// const Button = styled.button`
-//   background-color: #001965;
-//   color: white;
-//   border: none;
-//   border-radius: 5px;
-//   padding: 10px 20px;
-//   font-size: 18px;
-//   cursor: pointer;
-//   transition: background-color 0.3s;
-
-//   &:hover {
-//     background-color: #384b70;
-//   }
-// `;
-
 const Profiles = () => {
-  const [name, setName] = React.useState('John Doe');
-  const [businessName, setBusinessName] = React.useState('ABC Corporation');
-  const [businessRegNumber, setBusinessRegNumber] = React.useState('1234567890');
-  const [email, setEmail] = React.useState('johndoe@example.com');
-  const [phone, setPhone] = React.useState('123-456-7890');
+  const [name] = React.useState('Financial Institution');
+  const [businessName] = React.useState('Payback Nigeria');
+  const [businessRegNumber] = React.useState('1234567890');
+  const [email] = React.useState('payback@gmail.com');
+  const [phone] = React.useState('08101590149');
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1 },
+  };
 
   return (
     <ProfilesContainer>
       <Navbar />
       <ContentContainer>
-        <ProfileCard>
-    
-          <Label>Name:</Label>
-          <Input type="text" value={name} onChange={(e) => setName(e.target.value)}  readOnly />
+        <ProfileCard
+          initial="hidden"
+          animate="visible"
+          variants={cardVariants}
+          transition={{ duration: 0.5 }}
+        >
+          <Label>Service:</Label>
+          <Input type="text" value={name} readOnly />
+
           <Label>Business Name:</Label>
-          <Input type="text" value={businessName} onChange={(e) => setBusinessName(e.target.value)}  readOnly />
+          <Input type="text" value={businessName} readOnly />
+
           <Label>Business Registration Number:</Label>
-          <Input type="text" value={businessRegNumber} onChange={(e) => setBusinessRegNumber(e.target.value)}  readOnly />
+          <Input type="text" value={businessRegNumber} readOnly />
+
           <Label>Email:</Label>
-          <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)}  readOnly/>
-            <Label>Phone:</Label>
-            <Input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}  readOnly />
-           
-            </ProfileCard>
-            </ContentContainer>
-    </ProfilesContainer>    
-);
+          <Input type="email" value={email} readOnly />
+
+          <Label>Phone:</Label>
+          <Input type="tel" value={phone} readOnly />
+        </ProfileCard>
+      </ContentContainer>
+    </ProfilesContainer>
+  );
 };
 
 export default Profiles;
